@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="description"
+        content="Gaussian Variation Field Diffusion for High-fidelity Video-to-4D Synthesis">
+  <meta name="keywords" content="Gaussian Splatting, 4D Generative Modeling ">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Gaussian Variation Field Diffusion for High-fidelity Video-to-4D Synthesis</title>
+
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-PYVRSFMDRL"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+
+    function gtag() {
+      dataLayer.push(arguments);
+    }
+
+    gtag('js', new Date());
+
+    gtag('config', 'G-PYVRSFMDRL');
+  </script>
+
+  <link href="https://fonts.googleapis.com/css?family=Google+Sans|Noto+Sans|Castoro"
+        rel="stylesheet">
+
+  <link rel="stylesheet" href="./static/css/bulma.min.css">
+  <link rel="stylesheet" href="./static/css/bulma-carousel.min.css">
+  <link rel="stylesheet" href="./static/css/bulma-slider.min.css">
+  <link rel="stylesheet" href="./static/css/fontawesome.all.min.css">
+  <link rel="stylesheet"
+        href="https://cdn.jsdelivr.net/gh/jpswalsh/academicons@1/css/academicons.min.css">
+  <link rel="stylesheet" href="./static/css/index.css">
+  <link rel="icon" href="./static/images/github.svg">
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <script defer src="./static/js/fontawesome.all.min.js"></script>
+  <script src="./static/js/bulma-carousel.min.js"></script>
+  <script src="./static/js/bulma-slider.min.js"></script>
+  <script src="./static/js/index.js"></script>
+  <script>  
+    window.MathJax = {  
+      tex: {  
+        inlineMath: [['$', '$'], ['\\(', '\\)']]  
+      },  
+      svg: {  
+        fontCache: 'global'  
+      }  
+    };  
+  </script>  
+  <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>      
+</head>
+<body>
+
+<section class="hero">
+  <div class="hero-body">
+    <div class="container is-max-desktop">
+      <div class="columns is-centered">
+        <div class="column has-text-centered">
+          <h1 class="title is-1 publication-title">Gaussian Variation Field Diffusion <br> for High-fidelity Video-to-4D Synthesis</h1>
+          <div class="is-size-5 publication-authors">
+            <span class="author-block">
+              <a href="http://home.ustc.edu.cn/~zhangbowen">Bowen Zhang</a><sup>1</sup>,</span>
+            <span class="author-block">
+              <a href="https://scholar.google.com/citations?user=RKudwboAAAAJ&hl=en">Sicheng Xu</a><sup>2</sup>,</span>
+            <span class="author-block">
+              <a href="https://chuxwa.github.io/">Chuxin Wang</a><sup>1</sup>,</span>
+            <span class="author-block">
+              <a href="https://jlyang.org/">Jiaolong Yang</a><sup>2</sup>,
+            </span>
+            <br>
+            <span class="author-block">
+              <a href="https://en.auto.ustc.edu.cn/2021/0616/c26828a513169/page.htm">Feng Zhao</a><sup>1</sup>,
+            </span>
+            <span class="author-block">
+              <a href="http://www.dongchen.pro/">Dong Chen</a><sup>2</sup>,
+            </span>
+            <span class="author-block">
+              <a href="https://www.microsoft.com/en-us/research/people/bainguo/">Baining Guo</a><sup>2</sup>.
+            </span>
+          </div>
+
+          <div class="is-size-5 publication-authors">
+            <span class="author-block"><sup>1</sup>University of Science and Technology of China,</span>
+            <span class="author-block"><sup>2</sup>Microsoft Research Asia</span>
+          </div>
+
+          <div class="column has-text-centered">
+            <div class="publication-links">
+              <!-- PDF Link. -->
+              <span class="link-block">
+                <a href="http://arxiv.org/"
+                   class="external-link button is-normal is-rounded is-dark">
+                  <span class="icon">
+                      <i class="fas fa-file-pdf"></i>
+                  </span>
+                  <span>Paper</span>
+                </a>
+              </span>
+              <!-- Code Link. -->
+              <span class="link-block">
+                <a href="https://github.com/"
+                   class="external-link button is-normal is-rounded is-dark">
+                  <span class="icon">
+                      <i class="fab fa-github"></i>
+                  </span>
+                  <span>Code</span>
+                  </a>
+              </span>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="hero is-light is-small">
+  <div class="hero-body">
+    <div class="container">
+      <div id="results-carousel" class="carousel results-carousel">
+        <div class="item item-steve">
+          <video poster="" id="steve" autoplay controls muted loop playsinline>
+            <source src="./static/videos/in-the-wild/bear.mp4"
+                    type="video/mp4">
+          </video>
+        </div>
+        <div class="item item-shiba">
+          <video poster="" id="shiba" autoplay controls muted loop playsinline>
+            <source src="./static/videos/in-the-wild/ironman.mp4"
+                    type="video/mp4">
+          </video>
+        </div>
+        <div class="item item-chair-tp">
+          <video poster="" id="chair-tp" autoplay controls muted loop playsinline>
+            <source src="./static/videos/in-the-wild/rat.mp4"
+                    type="video/mp4">
+          </video>
+        </div>
+        <div class="item item-chair-tp">
+          <video poster="" id="chair-tp" autoplay controls muted loop playsinline>
+            <source src="./static/videos/synthetic-results/man_running.mp4"
+                    type="video/mp4">
+          </video>
+        </div>
+        <div class="item item-chair-tp">
+          <video poster="" id="chair-tp" autoplay controls muted loop playsinline>
+            <source src="./static/videos/synthetic-results/monster.mp4"
+                    type="video/mp4">
+          </video>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container is-max-desktop">
+    <!-- Abstract. -->
+    <div class="columns is-centered has-text-centered">
+      <div class="column is-four-fifths">
+        <h2 class="title is-3">Abstract</h2>
+        <div class="content has-text-justified">
+          <p>
+            In this paper, we present a novel framework for video-to-4D generation that creates high-quality dynamic 3D content from single video inputs. Direct 4D diffusion modeling is extremely challenging due to costly data construction and the high-dimensional nature of jointly representing 3D shape, appearance, and motion. We address these challenges by introducing a <i>Direct 4DMesh-to-GS Variation Field VAE</i> that directly encodes canonical Gaussian Splats (GS) and their temporal variations from 3D animation data without per-instance fitting, and compresses high-dimensional animations into a compact latent space. Building upon this efficient representation, we train a <i>Gaussian Variation Field diffusion model</i> with temporal-aware Diffusion Transformer conditioned on input videos and canonical GS. Trained on carefully-curated animatable 3D objects from the Objaverse dataset, our model demonstrates superior generation quality compared to existing methods. It also exhibits remarkable generalization to in-the-wild video inputs despite being trained exclusively on synthetic data, paving the way for generating high-quality animated 3D content.
+          </p>
+        </div>
+      </div>
+    </div>
+    <!--/ Abstract. -->
+
+    <div class="columns is-centered has-text-centered">
+      <div class="column is-four-fifths">
+        <h2 class="title is-3">Method</h2>
+        <h3 class="title is-4">Direct 4DMesh-to-GS Variation Field VAE</h3>
+        <div>
+          <img src="static/images/Pipeline.jpg" class="center">
+        </div>
+        <div class="content has-text-justified">
+          <p>
+            <b>Framework of 4DMesh-to-GS Variation Field VAE.</b> Our VAE directly encodes 3D animation data into Gaussian Variation Fields within a compact latent space, optimized through image-level reconstruction loss and the proposed <i>mesh-guided loss</i>.
+          </p>
+        </div>
+        
+      </div>
+    </div>
+
+    <div class="columns is-centered has-text-centered">
+      <div class="column is-four-fifths">
+        <h3 class="title is-4">Gaussian Variation Field Diffusion Model</h3>
+        <div>
+          <img src="static/images/DiT.jpg" class="center" height="60%" width="60%">
+        </div>
+        <div class="content has-text-justified">
+          <p>
+            <b>Architecture of Gaussian Variation Field diffusion model.</b> Our model is built upon diffusion transformer, which takes noised latent as input and gradually denoises it conditioned on the video sequence and canonical GS.
+          </p>
+        </div>
+        
+      </div>
+    </div>
+
+    <div class="container is-max-desktop">
+      <div class="columns is-centered has-text-centered">
+        <h2 class="title is-3">In-the-wild Generation Results</h2>
+        <p></p>
+      </div>
+  
+      <div class="columns is-centered has-text-centered">
+        <div class="column">
+          <div class="content">
+            <video id="bear-video" autoplay="" controls="" muted="" loop="" playsinline="" width="100%" height="100%">
+              <source src="./static/videos/in-the-wild/bear.mp4" type="video/mp4">
+            </video>
+          </div>
+        </div>
+        <div class="column">
+          <div class="content">
+            <video id="rat-video" autoplay="" controls="" muted="" loop="" playsinline="" width="100%" height="100%">
+              <source src="./static/videos/in-the-wild/rat.mp4" type="video/mp4">
+            </video>
+          </div>
+        </div>
+        <div class="column">
+          <div class="content">
+            <video id="ironman-video" autoplay="" controls="" muted="" loop="" playsinline="" width="100%" height="100%">
+              <source src="./static/videos/in-the-wild/ironman.mp4" type="video/mp4">
+            </video>
+          </div>
+        </div>
+      </div>
+  
+      </div>
+
+      <br>
+
+      <div class="container is-max-desktop">
+        <div class="columns is-centered has-text-centered">
+          <h2 class="title is-3">More Generation Results</h2>
+          <p></p>
+        </div>
+  
+        <div class="columns is-centered has-text-centered">
+          <div class="column">
+            <div class="content">
+              <video id="bear-video" autoplay="" controls="" muted="" loop="" playsinline="" width="60%" height="60%">
+                <source src="./static/videos/synthetic-results/monster.mp4" type="video/mp4">
+              </video>
+            </div>
+          </div>
+          <div class="column">
+            <div class="content">
+              <video id="rat-video" autoplay="" controls="" muted="" loop="" playsinline="" width="60%" height="60%">
+                <source src="./static/videos/synthetic-results/man_running.mp4" type="video/mp4">
+              </video>
+            </div>
+          </div>
+        </div>
+
+      <div class="container is-max-desktop">
+        <div class="columns is-centered has-text-centered">
+          <h2 class="title is-3">Animating Existing 3D Models</h2>
+        </div>
+  
+        <div class="columns is-centered has-text-centered">
+          <div class="column">
+            <div class="content">
+              <video id="bear-video" autoplay="" controls="" muted="" loop="" playsinline="" width="60%" height="60%">
+                <source src="./static/videos/animating-existing-3d-models/man_dancing_animating_existing_3d.mp4" type="video/mp4">
+              </video>
+            </div>
+          </div>
+          <div class="column">
+            <div class="content">
+              <video id="rat-video" autoplay="" controls="" muted="" loop="" playsinline="" width="60%" height="60%">
+                <source src="./static/videos/animating-existing-3d-models/woman_dancing_animating_existing_3d.mp4" type="video/mp4">
+              </video>
+            </div>
+          </div>
+        </div>
+
+      <div class="container is-max-desktop">
+        <div class="columns is-centered has-text-centered">
+          <h2 class="title is-3">Visual Comparison with Other Methods</h2>
+          <p></p>
+      </div>
+  
+      <div class="columns is-centered has-text-centered">
+        <div class="column">
+          <div class="columns is-centered has-text-centered">
+            <div class="column content">
+              <video id="matting-video" autoplay="" controls="" muted="" loop="" playsinline="" width="75%" height="75%">
+                <source src="./static/videos/comparison/banana_comparison.mp4" type="video/mp4">
+              </video>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="columns is-centered has-text-centered">
+        <div class="column">
+          <div class="columns is-centered has-text-centered">
+            <div class="column content">
+              <video id="matting-video" autoplay="" controls="" muted="" loop="" playsinline="" width="75%" height="75%">
+                <source src="./static/videos/comparison/bat_man_comparison.mp4" type="video/mp4">
+              </video>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="columns is-centered has-text-centered">
+        <div class="column">
+          <div class="columns is-centered has-text-centered">
+            <div class="column content">
+              <video id="matting-video" autoplay="" controls="" muted="" loop="" playsinline="" width="75%" height="75%">
+                <source src="./static/videos/comparison/boy_running_comparison.mp4" type="video/mp4">
+              </video>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="columns is-centered has-text-centered">
+        <div class="column">
+          <div class="columns is-centered has-text-centered">
+            <div class="column content">
+              <video id="matting-video" autoplay="" controls="" muted="" loop="" playsinline="" width="75%" height="75%">
+                <source src="./static/videos/comparison/dear_comparison.mp4" type="video/mp4">
+              </video>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="container is-max-desktop">
+        <div class="columns is-centered has-text-centered">
+          <h2 class="title is-3">VAE Reconstruction Results</h2>
+          <p></p>
+      </div>
+  
+      <div class="columns is-centered has-text-centered">
+        <div class="column">
+          <div class="columns is-centered has-text-centered">
+            <div class="column content">
+              <video id="matting-video" autoplay="" controls="" muted="" loop="" playsinline="" width="75%" height="75%">
+                <source src="./static/videos/VAE_recon/VAE_recon_1.mp4" type="video/mp4">
+              </video>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="columns is-centered has-text-centered">
+        <div class="column">
+          <div class="columns is-centered has-text-centered">
+            <div class="column content">
+              <video id="matting-video" autoplay="" controls="" muted="" loop="" playsinline="" width="75%" height="75%">
+                <source src="./static/videos/VAE_recon/VAE_recon_2.mp4" type="video/mp4">
+              </video>
+            </div>
+          </div>
+        </div>
+      </div>
+
+
+      <div class="columns is-centered has-text-centered">
+        <div class="column is-four-fifths">
+          <h2 class="title is-3">Demo Video</h2>
+          <div class="publication-video">
+            <iframe src="https://www.youtube.com/embed/"
+                    frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+          </div>
+          
+        </div>
+      </div>
+
+  </div>
+</section>
+
+
+<section class="section" id="BibTeX">
+  <div class="container is-max-desktop content">
+    <h2 class="title">BibTeX</h2>
+    <pre><code></code></pre>
+  </div>
+</section>
+
+
+<footer class="footer">
+  <div class="container">
+    <div class="columns is-centered">
+      <div class="column is-8">
+        <div class="content">
+          <p>
+            The website code is borrowed from the <a
+            href="https://github.com/nerfies/nerfies.github.io">source code</a> of Nerfies. We thank the authors for sharing the templates.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>
